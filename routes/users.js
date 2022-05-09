@@ -121,6 +121,60 @@ router.get("/following/:userId", cors.corsWithOptions, authenticate.verifyUser, 
 }
 );
 
+router.get("/angular-followers/:userId", cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  User.findById(req.params.userId)
+    .populate({
+        path : 'followers',
+        populate : {
+          path : 'id'
+        }
+      })
+    .then(user => {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(user.followers);
+    })
+    .catch(err => {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ err: err });
+    });
+}
+);
+
+router.get("/angular-following/:userId", cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  User.findById(req.params.userId)
+  .populate({
+    path : 'following',
+    populate : {
+      path : 'id'
+    }
+  })
+    .populate({
+      path : 'following',
+      populate : {
+        path : 'id',
+        populate : {
+          path : 'stories',
+          populate : {
+            path : 'userData'
+          }
+        }
+      }
+    })
+    .then(user => {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(user.following);
+    })
+    .catch(err => {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ err: err });
+    });
+}
+);
+
 router.post("/signup", cors.corsWithOptions, (req, res, next) => {
   User.findOne({ username: req.body.username })
   .then(user => {

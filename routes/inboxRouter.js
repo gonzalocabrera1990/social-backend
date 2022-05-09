@@ -130,6 +130,16 @@ module.exports = {
                     socketId: socket.id })
                     let clean = removeUser(data.id)
             });
+
+            socket.on('usernameAngular', (data) => {
+                const usuario = saveUser({ 
+                     id: data.id,
+                     name: data.name,
+                     socketId: socket.id })
+                     let clean = removeUser(data.id)
+                     socket.emit('returnUsernameAngular', usuario);
+             });
+
             socket.on('create-talk', ({contenido}) => {
                 if(contenido.members.userOne) {
                     Inbox.create(contenido)
